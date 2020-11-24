@@ -509,10 +509,10 @@ int main(int argc, char **argv)
 
     fflag = FALSE;
     if (nolinks) {
-      if (force_color) fprintf(outfile, "<b class=\"NORM\">%s</b>",host);
+      if (force_color) fprintf(outfile, "<b class=\"ROOT\">%s</b>",host);
       else fprintf(outfile,"%s",host);
     } else {
-      if (force_color) fprintf(outfile,"<a class=\"NORM\" href=\"%s\">%s</a>",host,host);
+      if (force_color) fprintf(outfile,"<a class=\"ROOT\" href=\"%s\">%s Directory</a>",host,title);
       else fprintf(outfile,"<a href=\"%s\">%s</a>",host,host);
     }
     curdir = gnu_getcwd();
@@ -607,9 +607,9 @@ int main(int argc, char **argv)
   if (Hflag) {
     fprintf(outfile,"\t<br><br>\n\t</p>\n");
     fprintf(outfile,"\t<hr>\n");
-    fprintf(outfile,"\t<p class=\"VERSION\">\n");
-    fprintf(outfile,hversion,linedraw->copy, linedraw->copy, linedraw->copy, linedraw->copy);
-    fprintf(outfile,"\t</p>\n");
+    // fprintf(outfile,"\t<p class=\"VERSION\">\n");
+    // fprintf(outfile,hversion,linedraw->copy, linedraw->copy, linedraw->copy, linedraw->copy);
+    // fprintf(outfile,"\t</p>\n");
     fprintf(outfile,"</body>\n");
     fprintf(outfile,"</html>\n");
   } else if (Xflag) {
