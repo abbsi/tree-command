@@ -19,7 +19,7 @@
 #include "tree.h"
 
 extern bool dflag, lflag, pflag, sflag, Fflag, aflag, fflag, uflag, gflag;
-extern bool Dflag, inodeflag, devflag, Rflag;
+extern bool Dflag, inodeflag, devflag, Rflag, Bflag;
 extern bool noindent, force_color, xdev, nolinks, flimit;
 //extern char *title,
 extern char *host, *sp;
@@ -36,7 +36,7 @@ extern char *endcode;
 void html_encode(FILE *, char *), url_encode(FILE *, char *);
 void url_encode(FILE *fd, char *s);
 
-void emit_html_header(const char *charset, char *title, char *version)
+void emit_html_header(const char *charset, char *title, char *version, char *csspath)
 {
   fprintf(outfile,
 	"<!DOCTYPE html>\n"
@@ -45,29 +45,36 @@ void emit_html_header(const char *charset, char *title, char *version)
 	" <meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">\n"
 	" <meta name=\"Author\" content=\"Made by 'tree'\">\n"
 	" <meta name=\"GENERATOR\" content=\"%s\">\n"
-	" <title>%s</title>\n"
-	// " <style type=\"text/css\">\n  <!-- \n"
-	// "  BODY { font-family : ariel, monospace, sans-serif; }\n"
-	// "  P { font-weight: normal; font-family : ariel, monospace, sans-serif; color: black; background-color: transparent;}\n"
-	// "  B { font-weight: normal; color: black; background-color: transparent;}\n"
-	// "  A:visited { font-weight : normal; text-decoration : none; background-color : transparent; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
-	// "  A:link    { font-weight : normal; text-decoration : none; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
-	// "  A:hover   { color : #000000; font-weight : normal; text-decoration : underline; background-color : yellow; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
-	// "  A:active  { color : #000000; font-weight: normal; background-color : transparent; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
-	// "  .VERSION { font-size: small; font-family : arial, sans-serif; }\n"
-	// "  .NORM  { color: blue;  background-color: transparent;}\n"
-	// "  .FIFO  { color: purple; background-color: transparent;}\n"
-	// "  .CHAR  { color: yellow; background-color: transparent;}\n"
-	// "  .DIR   { color: red;   background-color: transparent; text-transform: uppercase;}\n"
-	// "  .BLOCK { color: yellow; background-color: transparent;}\n"
-	// "  .LINK  { color: aqua;   background-color: transparent;}\n"
-	// "  .SOCK  { color: fuchsia;background-color: transparent;}\n"
-	// "  .EXEC  { color: green;  background-color: transparent;}\n"
-	// "  -->\n </style>\n"
-  " <link rel=\"stylesheet\" href=\"html/css/tree.css\" />"
-	"</head>\n"
+	" <title>%s</title>\n",charset ? charset : "iso-8859-1", version, title);
+
+  if (Bflag) {
+    fprintf(outfile, " <link rel=\"stylesheet\" href=\"%s\" />", csspath);
+  }
+  else {
+    fprintf(outfile,
+    " <style type=\"text/css\">\n  <!-- \n"
+    "  BODY { font-family : ariel, monospace, sans-serif; }\n"
+    "  P { font-weight: normal; font-family : ariel, monospace, sans-serif; color: black; background-color: transparent;}\n"
+    "  B { font-weight: normal; color: black; background-color: transparent;}\n"
+    "  A:visited { font-weight : normal; text-decoration : none; background-color : transparent; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
+    "  A:link    { font-weight : normal; text-decoration : none; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
+    "  A:hover   { color : #000000; font-weight : normal; text-decoration : underline; background-color : yellow; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
+    "  A:active  { color : #000000; font-weight: normal; background-color : transparent; margin : 0px 0px 0px 0px; padding : 0px 0px 0px 0px; display: inline; }\n"
+    "  .VERSION { font-size: small; font-family : arial, sans-serif; }\n"
+    "  .NORM  { color: blue;  background-color: transparent;}\n"
+    "  .FIFO  { color: purple; background-color: transparent;}\n"
+    "  .CHAR  { color: yellow; background-color: transparent;}\n"
+    "  .DIR   { color: red;   background-color: transparent; text-transform: uppercase;}\n"
+    "  .BLOCK { color: yellow; background-color: transparent;}\n"
+    "  .LINK  { color: aqua;   background-color: transparent;}\n"
+    "  .SOCK  { color: fuchsia;background-color: transparent;}\n"
+    "  .EXEC  { color: green;  background-color: transparent;}\n"
+    "  -->\n </style>\n");
+  }
+  fprintf(outfile,	
+  "</head>\n"
 	"<body>\n"
-	"\t<h1>%s</h1><p>\n\t",charset ? charset : "iso-8859-1", version, title, title);
+	"\t<h1>%s</h1><p>\n\t", title);
 }
 
 off_t html_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev)

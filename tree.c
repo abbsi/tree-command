@@ -28,9 +28,9 @@ static char *hversion="\t\t tree v1.8.0 %s 1996 - 2018 by Steve Baker and Thomas
 /* Globals */
 bool dflag, lflag, pflag, sflag, Fflag, aflag, fflag, uflag, gflag;
 bool qflag, Nflag, Qflag, Dflag, inodeflag, devflag, hflag, Rflag;
-bool Hflag, siflag, cflag, Xflag, Jflag, duflag, pruneflag;
+bool Hflag, siflag, cflag, Xflag, Jflag, duflag, pruneflag, Bflag;
 bool noindent, force_color, nocolor, xdev, noreport, nolinks, flimit, dirsfirst;
-bool ignorecase, matchdirs, fromfile;
+bool ignorecase, matchdirs, fromfile, footflag;
 bool reverse;
 char *pattern = NULL, *ipattern = NULL, *host = NULL, *title = "Directory Tree", *sp = " ", *_nl = "\n";
 char *file_comment = "#", *file_pathsep = "/";
@@ -41,7 +41,7 @@ struct _info **(*getfulltree)(char *d, u_long lev, dev_t dev, off_t *size, char 
 off_t (*listdir)(char *, int *, int *, u_long, dev_t) = unix_listdir;
 int (*cmpfunc)() = alnumsort;
 
-char *sLevel, *curdir, *outfilename = NULL;
+char *sLevel, *curdir, *outfilename = NULL, *csspath = NULL;
 FILE *outfile;
 int Level, *dirs, maxdirs;
 
@@ -95,10 +95,10 @@ int main(int argc, char **argv)
 
   q = p = dtotal = ftotal = 0;
   aflag = dflag = fflag = lflag = pflag = sflag = Fflag = uflag = gflag = FALSE;
-  Dflag = qflag = Nflag = Qflag = Rflag = hflag = Hflag = siflag = cflag = FALSE;
+  Dflag = qflag = Nflag = Qflag = Rflag = hflag = Hflag = siflag = cflag = Bflag = FALSE;
   noindent = force_color = nocolor = xdev = noreport = nolinks = reverse = FALSE;
   ignorecase = matchdirs = dirsfirst = inodeflag = devflag = Xflag = Jflag = FALSE;
-  duflag = pruneflag = FALSE;
+  duflag = pruneflag = footflag = FALSE;
   flimit = 0;
   dirs = xmalloc(sizeof(int) * (maxdirs=4096));
   memset(dirs, 0, sizeof(int) * maxdirs);
@@ -267,7 +267,16 @@ int main(int argc, char **argv)
 	  }
 	  outfilename = argv[n++];
 	  break;
-	case '-':
+  case 'Z':
+    if (argv[n] == NULL)
+    {
+      fprintf(stderr, "tree: missing argument to -Z option.\n");
+      exit(1);
+    }
+    Bflag = TRUE;
+    csspath = argv[n++];
+    break;
+  case '-':
 	  if (j == 1) {
 	    if (!strcmp("--", argv[i])) {
 	      optf = FALSE;
@@ -393,7 +402,13 @@ int main(int argc, char **argv)
 	      ignorecase = TRUE;
 	      break;
 	    }
-	    if (!strncmp("--matchdirs",argv[i],11)) {
+      if (!strncmp("--no-footer", argv[i], 11))
+      {
+        j = strlen(argv[i]) - 1;
+        footflag = TRUE;
+        break;
+      }
+      if (!strncmp("--matchdirs",argv[i],11)) {
 	      j = strlen(argv[i])-1;
 	      matchdirs = TRUE;
 	      break;
@@ -505,7 +520,7 @@ int main(int argc, char **argv)
     Rflag = FALSE;
 
   if (Hflag) {
-    emit_html_header(charset, title, version);
+    emit_html_header(charset, title, version, csspath);
 
     fflag = FALSE;
     if (nolinks) {
@@ -607,9 +622,11 @@ int main(int argc, char **argv)
   if (Hflag) {
     fprintf(outfile,"\t<br><br>\n\t</p>\n");
     fprintf(outfile,"\t<hr>\n");
-    // fprintf(outfile,"\t<p class=\"VERSION\">\n");
-    // fprintf(outfile,hversion,linedraw->copy, linedraw->copy, linedraw->copy, linedraw->copy);
-    // fprintf(outfile,"\t</p>\n");
+    if (!footflag) {
+      fprintf(outfile, "\t<p class=\"VERSION\">\n");
+      fprintf(outfile, hversion, linedraw->copy, linedraw->copy, linedraw->copy, linedraw->copy);
+      fprintf(outfile, "\t</p>\n");
+    }
     fprintf(outfile,"</body>\n");
     fprintf(outfile,"</html>\n");
   } else if (Xflag) {
@@ -684,9 +701,11 @@ void usage(int n)
 	"  ------- XML/HTML/JSON options -------\n"
 	"  -X            Prints out an XML representation of the tree.\n"
 	"  -J            Prints out an JSON representation of the tree.\n"
+  "  -Z path       Adds path to css file\n"
 	"  -H baseHREF   Prints out HTML format with baseHREF as top directory.\n"
 	"  -T string     Replace the default HTML title and H1 header with string.\n"
 	"  --nolinks     Turn off hyperlinks in HTML output.\n"
+  "  --no-footer   Disable the footer version information\n"
 	"  ------- Input options -------\n"
 	"  --fromfile    Reads paths from files (.=stdin)\n"
 	"  ------- Miscellaneous options -------\n"
