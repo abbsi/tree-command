@@ -153,7 +153,7 @@ off_t unix_rlistdir(char *d, int *dt, int *ft, u_long lev, dev_t dev);
 void r_listdir(struct _info **dir, char *d, int *dt, int *ft, u_long lev);
 
 /* html.c */
-void emit_html_header(const char *charset, char *title, char *versionm, char *csspath);
+void emit_html_header(const char *charset, char *title, char *version, char *csspath);
 off_t html_listdir(char *d, int *dt, int *ft, u_long lev, dev_t dev);
 off_t html_rlistdir(char *d, int *dt, int *ft, u_long lev, dev_t dev);
 void htmlr_listdir(struct _info **dir, char *d, int *dt, int *ft, u_long lev);
