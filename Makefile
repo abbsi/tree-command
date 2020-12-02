@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-prefix = /environment
+prefix = /env
 
 CC=gcc
 
@@ -114,7 +114,7 @@ install: tree
 	if [ -e $(TREE_DEST) ]; then \
 		install $(TREE_DEST) $(BINDIR)/$(TREE_DEST); \
 	fi
-	install doc/$(MAN) $(MANDIR)/$(MAN)
+#	install doc/$(MAN) $(MANDIR)/$(MAN)
 
 distclean:
 	if [ -f tree.o ]; then rm *.o; fi
